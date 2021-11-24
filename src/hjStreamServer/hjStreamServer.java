@@ -37,7 +37,7 @@ class hjStreamServer {
 		long q0 = 0;
 
 		//Load crypto properties
-		InputStream inputStream = new FileInputStream("src/configSecurity.properties");
+		InputStream inputStream = new FileInputStream("src/security/configSecurity.properties");
 		if (inputStream == null) {
 			System.err.println("Configuration file not found!");
 			System.exit(1);}

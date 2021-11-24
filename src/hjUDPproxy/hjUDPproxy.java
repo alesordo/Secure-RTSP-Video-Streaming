@@ -29,7 +29,7 @@ class hjUDPproxy {
         String destinations = properties.getProperty("localdelivery");
 
         //Load crypto properties
-        inputStream = new FileInputStream("src/configSecurity.properties");
+        inputStream = new FileInputStream("src/security/configSecurity.properties");
         if (inputStream == null) {
             System.err.println("Configuration file not found!");
             System.exit(1);}
