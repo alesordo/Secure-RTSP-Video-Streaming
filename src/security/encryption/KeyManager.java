@@ -3,10 +3,9 @@ package security.encryption;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.security.KeyStore;
+import java.util.Properties;
 
 public class KeyManager {
     private static KeyStore createKeyStore(String fileName, String pw, String algorithm) throws Exception {
@@ -40,13 +39,13 @@ public class KeyManager {
         }
         return keyStore;
     }
-    public static SecretKey[] getKeys(String fileName, String pw, String algorithm) throws Exception{
-        SecretKey secretKeys[] = new SecretKey[2];
+    public static SecretKey[] getKeys() throws Exception{
+        SecretKey[] secretKeys = new SecretKey[2];
+        String[] parameters = getParameters();
 
-        // retrieve the stored keys back
-//        File file = new File(fileName);
-//        final KeyStore keyStore = KeyStore.getInstance("JCEKS");
-//        keyStore.load(new FileInputStream(file), pw.toCharArray());
+        String fileName = parameters[1];
+        String pw = parameters[2];
+        String algorithm = parameters[0];
 
         //Retrieve/create KeyStore file
         KeyStore keyStore = createKeyStore(fileName,pw,algorithm);
@@ -60,5 +59,19 @@ public class KeyManager {
         KeyStore.Entry hMacKeyEntry = keyStore.getEntry("hMacSecretKey", keyPassword);
         secretKeys[1] = ((KeyStore.SecretKeyEntry) hMacKeyEntry).getSecretKey();
         return secretKeys;
+    }
+    public static String[] getParameters() throws Exception{
+        InputStream inputStream = new FileInputStream("src/security/configSecurity.properties");
+		if (inputStream == null) {
+			System.err.println("Configuration file not found!");
+			System.exit(1);}
+		Properties properties = new Properties();
+		properties.load(inputStream);
+
+        String algorithm = properties.getProperty("algorithm");
+        String keyStorePath = properties.getProperty("keyStorePath");
+        String keyStorePass = properties.getProperty("keyStorePass");
+
+        return new String[]{algorithm,keyStorePath,keyStorePass};
     }
 }

@@ -36,17 +36,11 @@ class hjStreamServer {
 		long t0 = System.nanoTime(); // Ref. time 
 		long q0 = 0;
 
-		//Load crypto properties
-		InputStream inputStream = new FileInputStream("src/security/configSecurity.properties");
-		if (inputStream == null) {
-			System.err.println("Configuration file not found!");
-			System.exit(1);}
-		Properties properties = new Properties();
-		properties.load(inputStream);
-
 		//Get keys
-		SecretKey[] key = getKeys(properties.getProperty("keyStorePath"),properties.getProperty("keyStorePass"),properties.getProperty("algorithm"));
+		SecretKey[] key = getKeys();
 
+		//Get algorithm parameter from configuration file
+		String algorithm = getParameters()[0];
 
 		while ( g.available() > 0 ) {
 		    
@@ -64,7 +58,8 @@ class hjStreamServer {
 
 			p.setSocketAddress( addr );
 
-			s.mySend(p,buff,size,key[0],key[1],properties.getProperty("algorithm"));
+			//s.mySend(p,buff,size,key[0],key[1],properties.getProperty("algorithm"));
+			s.mySend(p,buff,size,key[0],key[1],algorithm);
 
 	           	// Just for awareness ... (debug)
 

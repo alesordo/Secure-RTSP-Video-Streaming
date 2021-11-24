@@ -28,14 +28,6 @@ class hjUDPproxy {
 	String remote = properties.getProperty("remote");
         String destinations = properties.getProperty("localdelivery");
 
-        //Load crypto properties
-        inputStream = new FileInputStream("src/security/configSecurity.properties");
-        if (inputStream == null) {
-            System.err.println("Configuration file not found!");
-            System.exit(1);}
-        properties = new Properties();
-        properties.load(inputStream);
-
         SocketAddress inSocketAddress = parseSocketAddress(remote);
         Set<SocketAddress> outSocketAddressSet = Arrays.stream(destinations.split(",")).map(s -> parseSocketAddress(s)).collect(Collectors.toSet());
         MySRTSPDatagramSocket inSocket = new MySRTSPDatagramSocket(inSocketAddress);
@@ -43,11 +35,14 @@ class hjUDPproxy {
         byte[] buffer = new byte[4 * 1024];
 
         //Get keys
-        SecretKey[] key = getKeys(properties.getProperty("keyStorePath"),properties.getProperty("keyStorePass"),properties.getProperty("algorithm"));
+        SecretKey[] key = getKeys();
+
+        //Get algorithm parameter from configuration file
+        String algorithm = getParameters()[0];
        
         while (true) {
           DatagramPacket inPacket = new DatagramPacket(buffer, buffer.length);
- 	  byte[] ptData = inSocket.myReceive(inPacket,key[0],key[1],properties.getProperty("algorithm"));
+ 	  byte[] ptData = inSocket.myReceive(inPacket,key[0],key[1],algorithm);
 
           System.out.print("*");
           for (SocketAddress outSocketAddress : outSocketAddressSet) 
