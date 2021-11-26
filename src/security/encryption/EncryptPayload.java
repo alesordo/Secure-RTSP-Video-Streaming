@@ -5,7 +5,7 @@ import javax.crypto.spec.IvParameterSpec;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.security.*;
-import java.util.Arrays;
+
 
 
 public class EncryptPayload {
@@ -21,13 +21,13 @@ public class EncryptPayload {
         //HMac generation
         Mac hMac = Mac.getInstance("HmacSHA512");
 
-        // Cyphering
+        //Cyphering
         cipher.init(Cipher.ENCRYPT_MODE, keyFound, ivSpec);
 
         byte[] cipherText = new byte[cipher.getOutputSize(ptSize+hMac.getMacLength())];
         int ctSize = cipher.update(data, 0, ptSize, cipherText, 0);
         hMac.init(hMacKeyFound);
-        hMac.update(data);
+        hMac.update(data, 0, ptSize);
         ctSize += cipher.doFinal(hMac.doFinal(), 0, hMac.getMacLength(), cipherText, ctSize);
 
         //Merging ciphertext size, iv and ciphertext
@@ -64,7 +64,10 @@ public class EncryptPayload {
         byte[] messageHash = new byte[hMac.getMacLength()];
         System.arraycopy(plainText, messageLength, messageHash, 0, messageHash.length);
 
-        //Send the plainText back
-        return java.util.Arrays.copyOfRange(plainText, 0, messageLength);
+        //Send the plainText back, checking the integrity with the Mac
+        if(MessageDigest.isEqual(hMac.doFinal(),messageHash))
+            return java.util.Arrays.copyOfRange(plainText, 0, messageLength);
+        else
+            return new byte[0];
     }
 }

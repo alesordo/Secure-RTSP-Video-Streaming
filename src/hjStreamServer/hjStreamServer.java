@@ -1,15 +1,10 @@
-package hjStreamServer;/*
-* hjStreamServer.java 
-* Streaming server: streams video frames in UDP packets
-* for clients to play in real time the transmitted movies
-*/
+package hjStreamServer;
 
 import security.MySRTSPDatagramSocket;
 
 import javax.crypto.SecretKey;
 import java.io.*;
 import java.net.*;
-import java.util.Properties;
 
 import static security.encryption.KeyManager.*;
 
@@ -58,7 +53,6 @@ class hjStreamServer {
 
 			p.setSocketAddress( addr );
 
-			//s.mySend(p,buff,size,key[0],key[1],properties.getProperty("algorithm"));
 			s.mySend(p,buff,size,key[0],key[1],algorithm);
 
 	           	// Just for awareness ... (debug)

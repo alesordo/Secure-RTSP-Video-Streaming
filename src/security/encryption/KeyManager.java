@@ -15,24 +15,23 @@ public class KeyManager {
             // .keystore file already exists => load it
             keyStore.load(new FileInputStream(file), pw.toCharArray());
         } else {
-            // .keystore file not created yet => create it and save the key + the IV
+            // .keystore file not created yet => create it and save the keys
             keyStore.load(null, null);
-            //keyStore.store(new FileOutputStream(fileName), pw.toCharArray());
 
-            // generate a secret key for encryption - the same for all the blocks
+            //Generate a secret key for encryption - the same for all the blocks
             String[] fields= algorithm.split("/");
             SecretKey secretKey = KeyGenerator.getInstance(fields[0]).generateKey();
 
-            //generate a secret key for mac
+            //Generate a secret key for mac
             SecretKey hMacKey =new SecretKeySpec(secretKey.getEncoded(), "HmacSHA512");
 
-            // store the secret key
+            //Store the secret key
             KeyStore.SecretKeyEntry keyStoreEntry = new KeyStore.SecretKeyEntry(secretKey);
             KeyStore.PasswordProtection keyPassword = new KeyStore.PasswordProtection("pw-secret".toCharArray());
             keyStore.setEntry("mySecretKey", keyStoreEntry, keyPassword);
             keyStore.store(new FileOutputStream(fileName), pw.toCharArray());
 
-            //store the hmac key
+            //Store the hmac key
             KeyStore.SecretKeyEntry keyStoreHMacEntry = new KeyStore.SecretKeyEntry(hMacKey);
             keyStore.setEntry("hMacSecretKey",keyStoreHMacEntry,keyPassword);
             keyStore.store(new FileOutputStream(fileName),pw.toCharArray());
