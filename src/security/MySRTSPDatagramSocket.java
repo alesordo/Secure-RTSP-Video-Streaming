@@ -19,7 +19,7 @@ public class MySRTSPDatagramSocket extends DatagramSocket {
         super(bindaddr);
     }
     public void mySend(DatagramPacket p, byte[] buff, int ptSize, SecretKey key, SecretKey hMacKey, String algorithm) throws Exception {
-        byte[] fixedheader = {(byte) 00010000};
+        byte[] fixedheader = {0b00010000};
 
         //Encryption here
         EncryptPayload encryptPayload = new EncryptPayload();
@@ -39,7 +39,6 @@ public class MySRTSPDatagramSocket extends DatagramSocket {
 
         //Get the full packet
         byte[] packet = inPacket.getData();
-
         byte[] ctSizeHeader = copyOfRange(packet,1,3);
         int ctSize = ByteBuffer.wrap(ctSizeHeader).getShort();
 
@@ -47,7 +46,6 @@ public class MySRTSPDatagramSocket extends DatagramSocket {
 
         //Decryption here
         EncryptPayload encryptPayload = new EncryptPayload();
-        byte[] decryptedPayload = encryptPayload.decrypt(ctSize,encryptedBuff,key,hMacKey,algorithm);
-        return decryptedPayload;
+        return encryptPayload.decrypt(ctSize,encryptedBuff,key,hMacKey,algorithm);
     }
 }
