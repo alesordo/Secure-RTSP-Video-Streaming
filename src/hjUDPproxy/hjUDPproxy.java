@@ -18,14 +18,14 @@ import static security.encryption.KeyManager.*;
 
 class hjUDPproxy {
     public static void main(String[] args) throws Exception {
-        InputStream inputStream = new FileInputStream("src/hjUDPproxy/config.properties");
+        InputStream inputStream = new FileInputStream("hjUDPproxy/config.properties");
         if (inputStream == null) {
             System.err.println("Configuration file not found!");
             System.exit(1);
         }
         Properties properties = new Properties();
         properties.load(inputStream);
-	String remote = properties.getProperty("remote");
+	    String remote = properties.getProperty("remote");
         String destinations = properties.getProperty("localdelivery");
 
         SocketAddress inSocketAddress = parseSocketAddress(remote);
@@ -39,16 +39,22 @@ class hjUDPproxy {
 
         //Get algorithm parameter from configuration file
         String algorithm = getParameters()[0];
-       
-        while (true) {
-          DatagramPacket inPacket = new DatagramPacket(buffer, buffer.length);
- 	  byte[] ptData = inSocket.myReceive(inPacket,key[0],key[1],algorithm);
 
-          System.out.print("*");
-          for (SocketAddress outSocketAddress : outSocketAddressSet) 
-            {
-                outSocket.send(new DatagramPacket(ptData, ptData.length, outSocketAddress));
+        try{
+            while (true) {
+                DatagramPacket inPacket = new DatagramPacket(buffer, buffer.length);
+                byte[] ptData = inSocket.myReceive(inPacket,key[0],key[1],algorithm);
+
+                System.out.print("*");
+                for (SocketAddress outSocketAddress : outSocketAddressSet) 
+                {
+                    outSocket.send(new DatagramPacket(ptData, ptData.length, outSocketAddress));
+                }
             }
+        }
+        finally{
+            inSocket.close();
+            outSocket.close();
         }
     }
 

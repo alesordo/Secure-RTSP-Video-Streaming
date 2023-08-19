@@ -60,10 +60,11 @@ public class KeyManager {
         return secretKeys;
     }
     public static String[] getParameters() throws Exception{
-        InputStream inputStream = new FileInputStream("src/security/configSecurity.properties");
+        InputStream inputStream = new FileInputStream("security/configSecurity.properties");
 		if (inputStream == null) {
 			System.err.println("Configuration file not found!");
-			System.exit(1);}
+			System.exit(1);
+        }
 		Properties properties = new Properties();
 		properties.load(inputStream);
 

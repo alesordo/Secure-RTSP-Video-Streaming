@@ -4,10 +4,8 @@ import security.encryption.EncryptPayload;
 
 import javax.crypto.SecretKey;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 import static java.util.Arrays.copyOfRange;
 
@@ -44,7 +42,7 @@ public class MySRTSPDatagramSocket extends DatagramSocket {
 
         byte[] encryptedBuff = copyOfRange(packet,3,packet.length);
 
-        //Decryption here
+        //Decription here
         EncryptPayload encryptPayload = new EncryptPayload();
         return encryptPayload.decrypt(ctSize,encryptedBuff,key,hMacKey,algorithm);
     }

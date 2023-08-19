@@ -21,13 +21,16 @@ class hjStreamServer {
 		int size;
 		int csize = 0;
 		int count = 0;
+		String moviePath = args[0];
+		String socketAddress = args[1];
+		int socketPort = Integer.parseInt(args[2]);
  		long time;
-		DataInputStream g = new DataInputStream( new FileInputStream(args[0]) );
+		DataInputStream dataInput = new DataInputStream(new FileInputStream(moviePath));
 		byte[] buff = new byte[4096];
 
-		MySRTSPDatagramSocket s = new MySRTSPDatagramSocket();
-		InetSocketAddress addr = new InetSocketAddress( args[1], Integer.parseInt(args[2]));
-		DatagramPacket p = new DatagramPacket(buff, buff.length, addr );
+		MySRTSPDatagramSocket socket = new MySRTSPDatagramSocket();
+		InetSocketAddress addr = new InetSocketAddress(socketAddress, socketPort);
+		DatagramPacket packet = new DatagramPacket(buff, buff.length, addr);
 		long t0 = System.nanoTime(); // Ref. time 
 		long q0 = 0;
 
@@ -37,38 +40,43 @@ class hjStreamServer {
 		//Get algorithm parameter from configuration file
 		String algorithm = getParameters()[0];
 
-		while ( g.available() > 0 ) {
-		    
-		    size = g.readShort(); // size of the frame
-		    csize=csize+size;
-		    time = g.readLong();  // timestamp of the frame
-			if ( count == 0 ) q0 = time; // ref. time in the stream
-			count += 1;
-			g.readFully(buff, 0, size );
+		try{
+			while ( dataInput.available() > 0 ) {
+				
+				size = dataInput.readShort(); // size of the frame
+				csize=csize+size;
+				time = dataInput.readLong();  // timestamp of the frame
+				if ( count == 0 ) q0 = time; // ref. time in the stream
+				count += 1;
+				dataInput.readFully(buff, 0, size );
 
-			long t = System.nanoTime(); // what time is it?
+				long t = System.nanoTime(); // what time is it?
 
-			// Decision about the right time to transmit
-			Thread.sleep( Math.max(0, ((time-q0)-(t-t0))/1000000));
+				// Decision about the right time to transmit
+				Thread.sleep( Math.max(0, ((time-q0)-(t-t0))/1000000));
 
-			p.setSocketAddress( addr );
+				packet.setSocketAddress(addr);
 
-			s.mySend(p,buff,size,key[0],key[1],algorithm);
+				socket.mySend(packet,buff,size,key[0],key[1],algorithm);
 
-	           	// Just for awareness ... (debug)
+					// Just for awareness ... (debug)
 
-			System.out.print( "." );
+				System.out.print( "." );
+			}
+
+			long tEnd = System.nanoTime(); // "The end" time 
+					System.out.println();
+			System.out.println("DONE! all frames sent: "+ count);
+
+			long duration=(tEnd-t0)/1000000000;
+			System.out.println("Movie duration "+ duration + "s");
+			System.out.println("Throughput "+ count/duration + " fps");
+					System.out.println("Throughput "+ (8*(csize)/duration)/1000 + " Kbps");
 		}
-
-		long tend = System.nanoTime(); // "The end" time 
-                System.out.println();
-		System.out.println("DONE! all frames sent: "+ count);
-
-		long duration=(tend-t0)/1000000000;
-		System.out.println("Movie duration "+ duration + " s");
-		System.out.println("Throughput "+ count/duration + " fps");
-     	        System.out.println("Throughput "+ (8*(csize)/duration)/1000 + " Kbps");
-
+		finally{
+			dataInput.close();
+			socket.close();
+		}
 	}
 }
 
