@@ -2,6 +2,10 @@
 
 Java implementation of a Client/Server protocol to transmit videos safely through UDP
 
+## Project overview
+
+
+
 ## Project structure
 
 ```bash
@@ -27,6 +31,3 @@ src
             EncryptPayload.java
             KeyManager.java
 ```
-
-## Project overview
-
