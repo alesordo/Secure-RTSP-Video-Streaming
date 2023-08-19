@@ -60,18 +60,20 @@ public class KeyManager {
         return secretKeys;
     }
     public static String[] getParameters() throws Exception{
-        InputStream inputStream = new FileInputStream("security/configSecurity.properties");
-		if (inputStream == null) {
-			System.err.println("Configuration file not found!");
-			System.exit(1);
+        try{
+            InputStream inputStream = new FileInputStream("security/configSecurity.properties");
+            Properties properties = new Properties();
+            properties.load(inputStream);
+
+            String algorithm = properties.getProperty("algorithm");
+            String keyStorePath = properties.getProperty("keyStorePath");
+            String keyStorePass = properties.getProperty("keyStorePass");
+
+            return new String[]{algorithm,keyStorePath,keyStorePass};
         }
-		Properties properties = new Properties();
-		properties.load(inputStream);
-
-        String algorithm = properties.getProperty("algorithm");
-        String keyStorePath = properties.getProperty("keyStorePath");
-        String keyStorePass = properties.getProperty("keyStorePass");
-
-        return new String[]{algorithm,keyStorePath,keyStorePass};
+        catch(Exception e){
+            System.err.println("Security configuration file not found!");
+            throw e;
+        }
     }
 }
