@@ -10,7 +10,7 @@ import java.util.Properties;
 public class KeyManager {
     private static KeyStore createKeyStore(String fileName, String pw, String algorithm) throws Exception {
         File file = new File(fileName);
-        final KeyStore keyStore = KeyStore.getInstance("JCEKS");
+        final KeyStore keyStore = KeyStore.getInstance("PKCS12");
         if (file.exists()) {
             // .keystore file already exists => load it
             keyStore.load(new FileInputStream(file), pw.toCharArray());
@@ -23,7 +23,7 @@ public class KeyManager {
             SecretKey secretKey = KeyGenerator.getInstance(fields[0]).generateKey();
 
             //Generate a secret key for mac
-            SecretKey hMacKey =new SecretKeySpec(secretKey.getEncoded(), "HmacSHA512");
+            SecretKey hMacKey = new SecretKeySpec(secretKey.getEncoded(), "HmacSHA512");
 
             //Store the secret key
             KeyStore.SecretKeyEntry keyStoreEntry = new KeyStore.SecretKeyEntry(secretKey);
