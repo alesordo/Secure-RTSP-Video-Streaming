@@ -12,7 +12,9 @@ The system is composed by a Streaming Server, a ProxyBox and an MPEG Player tool
 
 The **security protocol** used to encrypt the video stream is a "simplified" [**SRTSP - Secure Real Time Streaming Protocol**](https://en.wikipedia.org/wiki/Secure_Real-time_Transport_Protocol). SRTSP is used to secure the media streams sent by the Streaming Server and received by the ProxyBox. To deliver the received MPEG frame segments encapsulated in the SRTSP payload in clear format (plainframes), the ProxyBox must be able to decrypt and process the protected frames.
 
-SRTSP encapsulation uses [UDP](https://en.wikipedia.org/wiki/User_Datagram_Protocol) as transport protocol. This way, the data frames are encapsulated in SRTSP format and this one is, in turn, encapsulated in UDP format.
+It's simplified because the encryption keys are shared between Streaming Server and ProxyBox. A better implementation will use separate keys.
+
+[UDP](https://en.wikipedia.org/wiki/User_Datagram_Protocol) is the transport protocol. This way, the data frames are encapsulated in SRTSP format and this one is, in turn, encapsulated in UDP format.
 
 ## Project structure
 
