@@ -1,6 +1,6 @@
 # Secure simplified video streaming system
 
-Java implementation of an encrypted real-time media streaming system.
+Java implementation of an encrypted real-time media streaming system 🎥.
 
 ## Project overview
 
@@ -12,7 +12,7 @@ The system is composed by a Streaming Server, a ProxyBox and an MPEG Player tool
 
 The **security protocol** used to encrypt the video stream is a *simplified* [**SRTSP - Secure Real Time Streaming Protocol**](https://en.wikipedia.org/wiki/Secure_Real-time_Transport_Protocol). SRTSP is used to secure the media streams sent by the Streaming Server and received by the ProxyBox. To deliver the received MPEG frame segments encapsulated in the SRTSP payload in clear format (plainframes), the ProxyBox must be able to decrypt and process the protected frames.
 
-It's simplified because the cryptography between Streaming Server and ProxyBox is **symmetric**. A better implementation will use separate keys.
+It's simplified because the cryptography between Streaming Server and ProxyBox is [**symmetric**](https://en.wikipedia.org/wiki/Symmetric-key_algorithm). A better implementation will use separate keys and asymmetric cryptography.
 
 [UDP](https://en.wikipedia.org/wiki/User_Datagram_Protocol) is the **transport protocol**. Data frames are encapsulated in SRTSP format and all SRTSP payload is, in turn, encapsulated in a UDP datagram, as you can see below:
 
@@ -61,5 +61,25 @@ LICENSE
 
 ## Usage
 
+### Prerequisites
+
+You must have Java JDK installed on your system and an MPEG player like VLC.
+
 ### Configuration
 
+There are two configuration files, `src/hjUDPproxy/config.properties` and `src/security/configSecurity.properties`.
+
+- **config.properties**. In this file you can change the endpoints (IP addresses + ports) useful for the ProxyBox. `remote` is the endpoint from which the ProxyBox receives the encrypted data sent by the Streaming Server, `localdelivery` is the endpoint to which ProxyBox sends the unencrypted media frames for the MPEG player.
+- **configSecurity.properties**. `algorithm` is the encryption algorithm (see [here](https://docs.oracle.com/javase%2F7%2Fdocs%2Fapi%2F%2F/javax/crypto/Cipher.html) all algorithms available), `keyStorePath` is the path where the encryption/decryption private key is being stored and `keyStorePass` is the password to access the private key.
+
+### Running the system
+
+The system will run by default on localhost, but you can choose to set up a remote host for the server.
+
+To run the **client**, open a new terminal, move to the repository directory and to `src` using the `cd ...` command. From here, compile the client file by typing `javac .\hjUDPproxy\hjUDPproxy.java`. Then, run the client by typing `java hjUDPproxy.hjUDPproxy`. Now the client is waiting for a stream from the server.
+
+Before starting the stream, let's open up **VLC** to receive it. From the main page, click `Media -> Open Network Stream`. On the box type `udp:\\@localdelivery`, where `localdelivery` matches the value of the parameter presented [here](#configuration) with the same name.
+
+In the end, run the **server** similarly to the client. So, open a new terminal and, from the `src` folder, type `javac .\hjStreamServer\hjStreamServer.java`. Then, choose a movie you like from the `hjStreamServer/movies` folder and type `java hjStreamServer.hjStreamServer hjStreamServer\movies\movie-name.dat remote-ip remote-port`. `movie-name.dat` must match the name of the movie you want to transmit, while `remote-ip` and `remote-port` are the values that match the [configured](#configuration) `remote` parameter.
+
+You should now see that the server is transmitting, the client is receiving and the player is playing. Well done!
